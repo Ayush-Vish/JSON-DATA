@@ -1,19 +1,24 @@
-const express = require("express") ;
-const json = require("./csvjson.json");
+// JSON Server module
+const jsonServer = require("json-server");
+const server = jsonServer.create();
+const router = jsonServer.router("db/db.json");
 
-const dotenv= require("dotenv")
-dotenv.config();
+// Make sure to use the default middleware
+const middlewares = jsonServer.defaults();
 
-const app = express() ;
+server.use(middlewares);
+// Add this before server.use(router)
+server.use(
+ // Add custom route here if needed
+ jsonServer.rewriter({
+  "/api/*": "/$1",
+ })
+);
+server.use(router);
+// Listen to port
+server.listen(3003, () => {
+ console.log("JSON Server is running");
+});
 
-
-app.get("/" , (req, res )=> {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.send(json);
-
-})
-
-app.listen(process.env.PORT, ()=> {
-    console.log("Server is Listening ");
-
-})
+// Export the Server API
+module.exports = server;
